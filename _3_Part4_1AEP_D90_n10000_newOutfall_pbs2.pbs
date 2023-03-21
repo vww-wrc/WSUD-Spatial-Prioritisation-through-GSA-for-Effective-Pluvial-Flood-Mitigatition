@@ -1,0 +1,16 @@
+#!/bin/bash
+ 
+#PBS -N A1D90_n10000_pbs2_newOutfall_resultCSV_processing 
+#PBS -l select=1:ncpus=1:mem=10gb
+#PBS -l walltime=00:15:00
+#PBS -j oe
+#PBS -k oed
+#PBS -M wenhui.wu2@unsw.edu.au
+#PBS -m abe
+#PBS -o /srv/scratch/z5327368/z5327368/250blk_1AEP_D90/n10000_pbs2results/
+
+cd $PBS_O_WORKDIR
+
+module load python/3.8.3
+source ~/.venvs/venv-tutorial-2/bin/activate
+python3 1AEP_D90_n10000_newOutfall_2csv.py

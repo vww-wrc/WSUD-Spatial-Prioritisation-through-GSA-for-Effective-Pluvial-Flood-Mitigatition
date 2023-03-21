@@ -1,0 +1,42 @@
+#!/bin/bash
+ 
+#PBS -N A1D90_n10000_pbs1_newOutfall
+#PBS -l select=1:ncpus=1:mem=1gb
+#PBS -l walltime=11:59:59
+#PBS -j oe
+#PBS -k oed
+#PBS -M wenhui.wu2@unsw.edu.au
+#PBS -m abe
+#PBS -o /srv/scratch/z5327368/z5327368/250blk_1AEP_D90/n10000_pbs1results/
+
+# Set the total number of subjobs.
+MAX_INDEX_VALUE=3000
+
+# Set the point at which you 
+export UPPER_END=$(($PBS_ARRAY_INDEX + 100))
+
+# If subjob number plus 100 is divisable by 500 then submit the next batch of 500 jobs.
+ 
+if (($UPPER_END % 500 == 0))
+then
+    export NEXT_MAX=$(($UPPER_END + 500))
+    export NEXT_START=$(($UPPER_END + 1))
+    export UPPER_END=$UPPER_END;       
+    
+    # Only submit a new batch if the upper limit will be less than the max.
+    if [ "$UPPER_END" -lt "$MAX_INDEX_VALUE" ];
+        then
+        # The actual job submission line
+        qsub -J ${NEXT_START}-${NEXT_MAX} $0
+        echo "New batch submitted when PBS_ARRAY_INDEX in pbs script is $PBS_ARRAY_INDEX"
+        echo "Upper end value ${UPPER_END}"
+        echo "next batch starts at subjob No. ${NEXT_START}"
+        echo "next batch ends at subjob No. ${NEXT_MAX}"
+    fi
+fi
+
+cd $PBS_O_WORKDIR
+
+module load python/3.8.3
+source ~/.venvs/venv-tutorial-2/bin/activate
+python3 /srv/scratch/z5327368/z5327368/1AEP_D90_n10000_newOutfall_1swmm.py ${PBS_ARRAY_INDEX} $TMPDIR
